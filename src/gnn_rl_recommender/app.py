@@ -15,7 +15,7 @@ def create_service():
         return MovieLensRecommenderService(
             artifact_dir=os.getenv("MODEL_DIR", "artifacts"),
             dataset_dir=os.getenv("MOVIELENS_DIR", "data/raw/ml-1m"),
-            policy_weight=float(os.getenv("POLICY_WEIGHT", "0.2")),
+            policy_weight=float(os.getenv("POLICY_WEIGHT", "0.1")),
         )
     return RecommenderService(os.getenv("MODEL_DIR", "artifacts"))
 

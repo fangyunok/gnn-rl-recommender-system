@@ -7,6 +7,8 @@ __pycache__/
 .env
 artifacts/*.pt
 artifacts/*.json
+artifacts/**/*.pt
+artifacts/**/*.json
 data/raw/
 dist/
 build/

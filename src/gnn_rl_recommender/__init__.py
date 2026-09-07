@@ -1,0 +1,4 @@
+"""GNN + reinforcement-learning recommender package."""
+
+__version__ = "0.1.0"
+

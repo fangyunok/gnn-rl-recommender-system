@@ -1,0 +1,30 @@
+{
+  "dataset": "MovieLens-1M",
+  "evaluated_users": 6040,
+  "top_k": 10,
+  "popularity": {
+    "recall_at_10": 0.035099,
+    "ndcg_at_10": 0.017322,
+    "coverage_at_10": 0.053157,
+    "diversity_at_10": 0.590430
+  },
+  "bpr_mf_30_epochs": {
+    "recall_at_10": 0.020695,
+    "ndcg_at_10": 0.009396,
+    "coverage_at_10": 0.198597,
+    "diversity_at_10": 0.785486
+  },
+  "lightgcn_30_epochs": {
+    "recall_at_10": 0.033940,
+    "ndcg_at_10": 0.016879,
+    "coverage_at_10": 0.061522,
+    "diversity_at_10": 0.617079
+  },
+  "lightgcn_plus_policy_weight_0.1": {
+    "recall_at_10": 0.035099,
+    "ndcg_at_10": 0.017572,
+    "coverage_at_10": 0.061522,
+    "diversity_at_10": 0.669367
+  }
+}
+

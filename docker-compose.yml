@@ -5,5 +5,10 @@ services:
       - "8000:8000"
     environment:
       MODEL_DIR: /app/artifacts
+      DATASET: ${DATASET:-synthetic}
+      MOVIELENS_DIR: /app/data/raw/ml-1m
+      POLICY_WEIGHT: ${POLICY_WEIGHT:-0.1}
+    volumes:
+      - ./artifacts:/app/artifacts:ro
+      - ./data/raw/ml-1m:/app/data/raw/ml-1m:ro
     restart: unless-stopped
-

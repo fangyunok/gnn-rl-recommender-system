@@ -20,20 +20,25 @@ FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务�
 - LightGCN 多层消息传播与 BPR pairwise ranking loss。
 - REINFORCE 重排策略，将相关性和类目新颖性组成长期奖励的最小实现。
 - `GET /health` 与 `GET /v1/recommendations/{user_id}` 在线接口。
+- API 支持 `synthetic` 演示模式与 `movielens` 真实权重模式切换。
 - pytest、Ruff、Docker Compose 和 GitHub Actions。
 - MovieLens-1M 按用户时间顺序 leave-two-out 切分与真实离线实验入口。
 - Recall@K、NDCG@K、Catalog Coverage、Intra-list Diversity 四类指标。
 
 > 合成数据仅用于快速验证工程链路；正式指标来自 MovieLens-1M。离线结果不等同于真实线上收益。
 
-### 实验 001 结果（6,040 名用户）
+### 当前最佳结果（实验 002，6,040 名用户）
 
 | 方法 | Recall@10 | NDCG@10 | Coverage@10 | Diversity@10 |
 |---|---:|---:|---:|---:|
-| LightGCN | 0.034272 | 0.016964 | 0.066919 | 0.611093 |
-| LightGCN + Policy（权重 0.2） | **0.034603** | **0.017536** | 0.066919 | **0.695695** |
+| Popularity | **0.035099** | 0.017322 | 0.053157 | 0.590430 |
+| BPR-MF | 0.020695 | 0.009396 | **0.198597** | 0.785486 |
+| 30 epoch LightGCN | 0.033940 | 0.016879 | 0.061522 | 0.617079 |
+| LightGCN + Policy（权重 0.1） | **0.035099** | **0.017572** | **0.061522** | **0.669367** |
 
-完整配置、权重扫描和局限性见 [实验 001 报告](docs/EXPERIMENT_001_MOVIELENS.md)。
+完整实验演进见 [实验 001 报告](docs/EXPERIMENT_001_MOVIELENS.md)和
+[实验 002 报告](docs/EXPERIMENT_002_EXTENDED_TRAINING.md)。
+图传播与矩阵分解的对照见 [实验 003 报告](docs/EXPERIMENT_003_BPR_MF_ABLATION.md)。
 
 ## MovieLens-1M 真实数据实验
 

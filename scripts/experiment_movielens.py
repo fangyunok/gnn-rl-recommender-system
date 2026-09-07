@@ -16,10 +16,17 @@ from gnn_rl_recommender.reranker import PolicyReranker
 
 
 def train_lightgcn(
-    split: MovieLensSplit, graph: torch.Tensor, epochs: int, samples: int, seed: int
+    split: MovieLensSplit,
+    graph: torch.Tensor,
+    epochs: int,
+    samples: int,
+    seed: int,
+    model: LightGCN | None = None,
+    label: str = "LightGCN",
 ) -> tuple[LightGCN, list[float]]:
     torch.manual_seed(seed)
-    model = LightGCN(split.train.num_users, split.train.num_items, dim=32, layers=2)
+    if model is None:
+        model = LightGCN(split.train.num_users, split.train.num_items, dim=32, layers=2)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     generator = torch.Generator().manual_seed(seed)
     losses: list[float] = []
@@ -46,7 +53,7 @@ def train_lightgcn(
         loss.backward()
         optimizer.step()
         losses.append(float(loss.detach()))
-        print(f"LightGCN epoch {epoch + 1}/{epochs}: loss={losses[-1]:.5f}")
+        print(f"{label} epoch {epoch + 1}/{epochs}: loss={losses[-1]:.5f}")
     return model, losses
 
 
@@ -168,6 +175,19 @@ def build_sweep_rankings(
     return baseline, sweeps
 
 
+def build_popularity_rankings(
+    split: MovieLensSplit, users: list[int], top_k: int
+) -> dict[int, list[int]]:
+    """Recommend globally popular unseen items as a non-personalized baseline."""
+    counts = torch.bincount(split.train.item_ids, minlength=split.train.num_items)
+    popular_items = torch.argsort(counts, descending=True).tolist()
+    rankings: dict[int, list[int]] = {}
+    for user in users:
+        seen = split.train_seen[user]
+        rankings[user] = [item for item in popular_items if item not in seen][:top_k]
+    return rankings
+
+
 def main(args: argparse.Namespace) -> dict:
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -183,8 +203,11 @@ def main(args: argparse.Namespace) -> dict:
         gnn_losses = [float("nan")]
         policy_losses = [float("nan")]
     else:
+        if args.resume_checkpoint:
+            payload = torch.load(args.resume_checkpoint, map_location="cpu", weights_only=True)
+            model.load_state_dict(payload["gnn"])
         model, gnn_losses = train_lightgcn(
-            split, graph, args.gnn_epochs, args.samples_per_epoch, args.seed
+            split, graph, args.gnn_epochs, args.samples_per_epoch, args.seed, model
         )
         policy_losses = train_policy(
             model,
@@ -208,6 +231,25 @@ def main(args: argparse.Namespace) -> dict:
         args.policy_weights,
     )
     categories = split.train.item_categories.tolist()
+    popularity = build_popularity_rankings(split, evaluation_users, args.top_k)
+    mf_metrics = None
+    if args.mf_epochs > 0:
+        mf = LightGCN(split.train.num_users, split.train.num_items, dim=32, layers=0)
+        mf, _ = train_lightgcn(
+            split,
+            graph,
+            args.mf_epochs,
+            args.samples_per_epoch,
+            args.seed + 100,
+            mf,
+            "BPR-MF",
+        )
+        mf_rankings = build_rankings(
+            mf, None, graph, split, evaluation_users, args.top_k, args.candidate_k
+        )
+        mf_metrics = evaluate_rankings(
+            mf_rankings, split.test_item, categories, split.train.num_items
+        ).as_dict()
     policy_sweep = {}
     for weight in args.policy_weights:
         policy_sweep[str(weight)] = evaluate_rankings(
@@ -218,12 +260,16 @@ def main(args: argparse.Namespace) -> dict:
         "split": "per-user chronological leave-two-out",
         "top_k": args.top_k,
         "candidate_k": args.candidate_k,
+        "popularity": evaluate_rankings(
+            popularity, split.test_item, categories, split.train.num_items
+        ).as_dict(),
+        "bpr_mf": mf_metrics,
         "lightgcn": evaluate_rankings(
             baseline, split.test_item, categories, split.train.num_items
         ).as_dict(),
         "policy_weight_sweep": policy_sweep,
         "training": {
-            "gnn_epochs": args.gnn_epochs,
+            "gnn_epochs": args.gnn_epochs + (args.previous_epochs if args.resume_checkpoint else 0),
             "rl_epochs": args.rl_epochs,
             "rl_users_per_epoch": args.rl_users,
             "final_gnn_loss": None if args.load_checkpoint else round(gnn_losses[-1], 6),
@@ -253,6 +299,7 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts"))
     parser.add_argument("--gnn-epochs", type=int, default=10)
     parser.add_argument("--rl-epochs", type=int, default=3)
+    parser.add_argument("--mf-epochs", type=int, default=0)
     parser.add_argument("--rl-users", type=int, default=1000)
     parser.add_argument("--samples-per-epoch", type=int, default=100_000)
     parser.add_argument("--eval-users", type=int, default=1000)
@@ -260,5 +307,7 @@ if __name__ == "__main__":
     parser.add_argument("--candidate-k", type=int, default=100)
     parser.add_argument("--policy-weights", type=float, nargs="+", default=[0.05, 0.1, 0.2, 0.5])
     parser.add_argument("--load-checkpoint", type=Path)
+    parser.add_argument("--resume-checkpoint", type=Path)
+    parser.add_argument("--previous-epochs", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
     main(parser.parse_args())

@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .venv/
+.tools/
 .env
 artifacts/*.pt
 artifacts/*.json
@@ -10,4 +11,3 @@ data/raw/
 dist/
 build/
 *.egg-info/
-

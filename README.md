@@ -21,9 +21,29 @@ FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务�
 - REINFORCE 重排策略，将相关性和类目新颖性组成长期奖励的最小实现。
 - `GET /health` 与 `GET /v1/recommendations/{user_id}` 在线接口。
 - pytest、Ruff、Docker Compose 和 GitHub Actions。
+- MovieLens-1M 按用户时间顺序 leave-two-out 切分与真实离线实验入口。
+- Recall@K、NDCG@K、Catalog Coverage、Intra-list Diversity 四类指标。
 
-> 当前版本是工程基线，合成数据结果不代表真实线上收益。下一阶段将接入 MovieLens-1M，增加
-> Recall@K、NDCG@K、Coverage、Diversity 离线对照实验，并升级为序列决策环境。
+> 合成数据仅用于快速验证工程链路；正式指标来自 MovieLens-1M。离线结果不等同于真实线上收益。
+
+### 实验 001 结果（6,040 名用户）
+
+| 方法 | Recall@10 | NDCG@10 | Coverage@10 | Diversity@10 |
+|---|---:|---:|---:|---:|
+| LightGCN | 0.034272 | 0.016964 | 0.066919 | 0.611093 |
+| LightGCN + Policy（权重 0.2） | **0.034603** | **0.017536** | 0.066919 | **0.695695** |
+
+完整配置、权重扫描和局限性见 [实验 001 报告](docs/EXPERIMENT_001_MOVIELENS.md)。
+
+## MovieLens-1M 真实数据实验
+
+```powershell
+python scripts\download_movielens.py
+python scripts\experiment_movielens.py --gnn-epochs 10 --rl-epochs 3 --eval-users 1000
+```
+
+数据按每位用户的时间戳排序：倒数第二次交互只用于训练策略，最后一次交互只用于测试。
+输出写入 `artifacts/movielens_metrics.json`，模型权重不会提交到 GitHub。
 
 ## 快速开始
 
@@ -73,4 +93,3 @@ docs/DEPLOYMENT.md       # 完整部署流程
 - 合成数据仅用于验证工程链路，不用于宣称业务指标。
 - 服务无模型文件时使用固定随机初始化完成演示；训练后自动加载 `artifacts/model.pt`。
 - 真实生产系统还需要特征平台、在线召回、实验平台、模型监控和数据漂移治理。
-

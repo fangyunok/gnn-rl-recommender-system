@@ -1,0 +1,34 @@
+{
+  "dataset": "MovieLens-1M",
+  "split": "per-user chronological leave-two-out",
+  "top_k": 10,
+  "candidate_k": 100,
+  "evaluated_users": 6040,
+  "training": {
+    "gnn_epochs": 15,
+    "samples_per_epoch": 100000,
+    "rl_epochs": 3,
+    "rl_users_per_epoch": 1000,
+    "seed": 42,
+    "final_gnn_loss": 0.561323,
+    "final_policy_loss": -0.001272
+  },
+  "lightgcn": {
+    "recall_at_10": 0.034272,
+    "ndcg_at_10": 0.016964,
+    "coverage_at_10": 0.066919,
+    "diversity_at_10": 0.611093
+  },
+  "lightgcn_plus_policy_weight_0.2": {
+    "recall_at_10": 0.034603,
+    "ndcg_at_10": 0.017536,
+    "coverage_at_10": 0.066919,
+    "diversity_at_10": 0.695695
+  },
+  "policy_weight_sweep": {
+    "0.1": {"recall_at_10": 0.034437, "ndcg_at_10": 0.017132, "diversity_at_10": 0.662163},
+    "0.2": {"recall_at_10": 0.034603, "ndcg_at_10": 0.017536, "diversity_at_10": 0.695695},
+    "0.5": {"recall_at_10": 0.033113, "ndcg_at_10": 0.017880, "diversity_at_10": 0.784400}
+  }
+}
+

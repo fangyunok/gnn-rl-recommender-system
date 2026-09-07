@@ -68,6 +68,8 @@ Invoke-RestMethod 'http://127.0.0.1:8000/v1/recommendations/3?limit=5'
 ```
 
 Docker 与云服务器部署见 [部署手册](docs/DEPLOYMENT.md)。
+系统分层和生产化边界见 [架构说明](docs/ARCHITECTURE.md)，求职讲解见
+[简历与面试指南](docs/INTERVIEW_GUIDE.md)。
 
 ## 仓库结构
 

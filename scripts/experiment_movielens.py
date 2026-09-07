@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
+from gnn_rl_recommender.baselines import build_popularity_rankings
 from gnn_rl_recommender.data import normalized_bipartite_graph
 from gnn_rl_recommender.lightgcn import LightGCN
 from gnn_rl_recommender.metrics import evaluate_rankings
@@ -173,19 +174,6 @@ def build_sweep_rankings(
             )[:top_k]
             sweeps[str(weight)][user] = ids[order].tolist()
     return baseline, sweeps
-
-
-def build_popularity_rankings(
-    split: MovieLensSplit, users: list[int], top_k: int
-) -> dict[int, list[int]]:
-    """Recommend globally popular unseen items as a non-personalized baseline."""
-    counts = torch.bincount(split.train.item_ids, minlength=split.train.num_items)
-    popular_items = torch.argsort(counts, descending=True).tolist()
-    rankings: dict[int, list[int]] = {}
-    for user in users:
-        seen = split.train_seen[user]
-        rankings[user] = [item for item in popular_items if item not in seen][:top_k]
-    return rankings
 
 
 def main(args: argparse.Namespace) -> dict:

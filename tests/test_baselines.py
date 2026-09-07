@@ -1,8 +1,8 @@
 import torch
 
+from gnn_rl_recommender.baselines import build_popularity_rankings
 from gnn_rl_recommender.data import InteractionData
 from gnn_rl_recommender.movielens import MovieLensSplit
-from scripts.experiment_movielens import build_popularity_rankings
 
 
 def test_popularity_baseline_filters_seen_items() -> None:
@@ -25,4 +25,3 @@ def test_popularity_baseline_filters_seen_items() -> None:
     assert all(item not in split.train_seen[user] for user, items in rankings.items() for item in items)
     assert rankings[0][0] == 2
     assert rankings[1][0] == 1
-

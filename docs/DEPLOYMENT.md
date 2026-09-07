@@ -16,7 +16,7 @@ uvicorn gnn_rl_recommender.app:app --host 0.0.0.0 --port 8000
 
 ```powershell
 $env:DATASET="movielens"
-$env:POLICY_WEIGHT="0.1"
+$env:POLICY_WEIGHT="0.2"
 powershell -ExecutionPolicy Bypass -File scripts\start_api.ps1 -Dataset movielens
 ```
 

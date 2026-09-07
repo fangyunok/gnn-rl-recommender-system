@@ -27,18 +27,20 @@ FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务�
 
 > 合成数据仅用于快速验证工程链路；正式指标来自 MovieLens-1M。离线结果不等同于真实线上收益。
 
-### 当前最佳结果（实验 002，6,040 名用户）
+### 当前最佳结果（实验 004，6,040 名用户）
 
 | 方法 | Recall@10 | NDCG@10 | Coverage@10 | Diversity@10 |
 |---|---:|---:|---:|---:|
-| Popularity | **0.035099** | 0.017322 | 0.053157 | 0.590430 |
+| Popularity | 0.035099 | 0.017322 | 0.053157 | 0.590430 |
 | BPR-MF | 0.020695 | 0.009396 | **0.198597** | 0.785486 |
-| 30 epoch LightGCN | 0.033940 | 0.016879 | 0.061522 | 0.617079 |
-| LightGCN + Policy（权重 0.1） | **0.035099** | **0.017572** | **0.061522** | **0.669367** |
+| 均匀负采样 LightGCN + Policy | 0.035099 | 0.017572 | 0.061522 | 0.669367 |
+| Hard-negative LightGCN | 0.046358 | 0.023338 | **0.335132** | 0.540670 |
+| Hard-negative LightGCN + Policy（权重 0.2） | **0.048179** | **0.023828** | 0.333243 | 0.597112 |
 
 完整实验演进见 [实验 001 报告](docs/EXPERIMENT_001_MOVIELENS.md)和
 [实验 002 报告](docs/EXPERIMENT_002_EXTENDED_TRAINING.md)。
 图传播与矩阵分解的对照见 [实验 003 报告](docs/EXPERIMENT_003_BPR_MF_ABLATION.md)。
+困难负采样的最终提升见 [实验 004 报告](docs/EXPERIMENT_004_HARD_NEGATIVE.md)。
 
 ## MovieLens-1M 真实数据实验
 

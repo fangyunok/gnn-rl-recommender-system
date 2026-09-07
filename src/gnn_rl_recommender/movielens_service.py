@@ -20,7 +20,7 @@ class MovieLensRecommenderService:
         self,
         artifact_dir: str = "artifacts",
         dataset_dir: str = "data/raw/ml-1m",
-        policy_weight: float = 0.1,
+        policy_weight: float = 0.2,
         candidate_k: int = 100,
     ):
         checkpoint = Path(artifact_dir) / "movielens_model.pt"

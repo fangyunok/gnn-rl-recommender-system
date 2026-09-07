@@ -38,6 +38,8 @@ class MovieLensRecommenderService:
         self.reranker.load_state_dict(payload["reranker"])
         self.gnn.eval()
         self.reranker.eval()
+        with torch.no_grad():
+            self.user_embeddings, self.item_embeddings = self.gnn.propagate(self.graph)
         self.policy_weight = policy_weight
         self.candidate_k = candidate_k
         self.loaded_from_artifact = True
@@ -50,8 +52,7 @@ class MovieLensRecommenderService:
         if user_id not in self.user_id_map:
             raise ValueError("unknown MovieLens user_id")
         internal_user = self.user_id_map[user_id]
-        users, items = self.gnn.propagate(self.graph)
-        raw_relevance = items @ users[internal_user]
+        raw_relevance = self.item_embeddings @ self.user_embeddings[internal_user]
         raw_relevance[list(self.split.train_seen[internal_user])] = -torch.inf
         relevance, candidate_ids = torch.topk(
             raw_relevance, min(self.candidate_k, self.data.num_items)
@@ -62,7 +63,10 @@ class MovieLensRecommenderService:
         )
         novelty = 1.0 / (1.0 + counts[categories].float())
         policy_scores = self.reranker.logits(
-            users[internal_user], items[candidate_ids], relevance, novelty
+            self.user_embeddings[internal_user],
+            self.item_embeddings[candidate_ids],
+            relevance,
+            novelty,
         )
         policy_scores = (policy_scores - policy_scores.mean()) / policy_scores.std().clamp_min(1e-6)
         relevance = (relevance - relevance.mean()) / relevance.std().clamp_min(1e-6)

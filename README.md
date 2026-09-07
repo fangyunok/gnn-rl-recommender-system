@@ -32,11 +32,13 @@ FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务�
 | 方法 | Recall@10 | NDCG@10 | Coverage@10 | Diversity@10 |
 |---|---:|---:|---:|---:|
 | Popularity | **0.035099** | 0.017322 | 0.053157 | 0.590430 |
+| BPR-MF | 0.020695 | 0.009396 | **0.198597** | 0.785486 |
 | 30 epoch LightGCN | 0.033940 | 0.016879 | 0.061522 | 0.617079 |
 | LightGCN + Policy（权重 0.1） | **0.035099** | **0.017572** | **0.061522** | **0.669367** |
 
 完整实验演进见 [实验 001 报告](docs/EXPERIMENT_001_MOVIELENS.md)和
 [实验 002 报告](docs/EXPERIMENT_002_EXTENDED_TRAINING.md)。
+图传播与矩阵分解的对照见 [实验 003 报告](docs/EXPERIMENT_003_BPR_MF_ABLATION.md)。
 
 ## MovieLens-1M 真实数据实验
 

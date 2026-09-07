@@ -22,6 +22,7 @@ def train_lightgcn(
     samples: int,
     seed: int,
     model: LightGCN | None = None,
+    label: str = "LightGCN",
 ) -> tuple[LightGCN, list[float]]:
     torch.manual_seed(seed)
     if model is None:
@@ -52,7 +53,7 @@ def train_lightgcn(
         loss.backward()
         optimizer.step()
         losses.append(float(loss.detach()))
-        print(f"LightGCN epoch {epoch + 1}/{epochs}: loss={losses[-1]:.5f}")
+        print(f"{label} epoch {epoch + 1}/{epochs}: loss={losses[-1]:.5f}")
     return model, losses
 
 
@@ -231,6 +232,24 @@ def main(args: argparse.Namespace) -> dict:
     )
     categories = split.train.item_categories.tolist()
     popularity = build_popularity_rankings(split, evaluation_users, args.top_k)
+    mf_metrics = None
+    if args.mf_epochs > 0:
+        mf = LightGCN(split.train.num_users, split.train.num_items, dim=32, layers=0)
+        mf, _ = train_lightgcn(
+            split,
+            graph,
+            args.mf_epochs,
+            args.samples_per_epoch,
+            args.seed + 100,
+            mf,
+            "BPR-MF",
+        )
+        mf_rankings = build_rankings(
+            mf, None, graph, split, evaluation_users, args.top_k, args.candidate_k
+        )
+        mf_metrics = evaluate_rankings(
+            mf_rankings, split.test_item, categories, split.train.num_items
+        ).as_dict()
     policy_sweep = {}
     for weight in args.policy_weights:
         policy_sweep[str(weight)] = evaluate_rankings(
@@ -244,6 +263,7 @@ def main(args: argparse.Namespace) -> dict:
         "popularity": evaluate_rankings(
             popularity, split.test_item, categories, split.train.num_items
         ).as_dict(),
+        "bpr_mf": mf_metrics,
         "lightgcn": evaluate_rankings(
             baseline, split.test_item, categories, split.train.num_items
         ).as_dict(),
@@ -279,6 +299,7 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts"))
     parser.add_argument("--gnn-epochs", type=int, default=10)
     parser.add_argument("--rl-epochs", type=int, default=3)
+    parser.add_argument("--mf-epochs", type=int, default=0)
     parser.add_argument("--rl-users", type=int, default=1000)
     parser.add_argument("--samples-per-epoch", type=int, default=100_000)
     parser.add_argument("--eval-users", type=int, default=1000)

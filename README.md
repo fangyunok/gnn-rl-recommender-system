@@ -20,6 +20,7 @@ FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务�
 - LightGCN 多层消息传播与 BPR pairwise ranking loss。
 - REINFORCE 重排策略，将相关性和类目新颖性组成长期奖励的最小实现。
 - `GET /health` 与 `GET /v1/recommendations/{user_id}` 在线接口。
+- API 支持 `synthetic` 演示模式与 `movielens` 真实权重模式切换。
 - pytest、Ruff、Docker Compose 和 GitHub Actions。
 - MovieLens-1M 按用户时间顺序 leave-two-out 切分与真实离线实验入口。
 - Recall@K、NDCG@K、Catalog Coverage、Intra-list Diversity 四类指标。

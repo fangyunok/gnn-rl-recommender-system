@@ -19,6 +19,8 @@ class Recommendation:
 
 
 class RecommenderService:
+    dataset_name = "synthetic"
+
     def __init__(self, artifact_dir: str = "artifacts"):
         self.data: InteractionData = make_synthetic_data()
         self.graph = normalized_bipartite_graph(self.data)
@@ -56,4 +58,3 @@ class RecommenderService:
             )
             for i in order
         ]
-

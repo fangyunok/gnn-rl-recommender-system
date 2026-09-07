@@ -22,6 +22,7 @@ class RecommenderService:
     dataset_name = "synthetic"
 
     def __init__(self, artifact_dir: str = "artifacts"):
+        torch.manual_seed(42)
         self.data: InteractionData = make_synthetic_data()
         self.graph = normalized_bipartite_graph(self.data)
         self.gnn = LightGCN(self.data.num_users, self.data.num_items)

@@ -6,23 +6,23 @@
 
 - 基于 MovieLens-1M 构建用户—物品二部图，采用按用户时间顺序 leave-two-out 切分，使用
   LightGCN + BPR 完成 Top-100 候选召回，并通过 BPR-MF 消融验证图传播贡献。
-- 设计融合相关性与类目新颖性的 Policy Gradient 重排策略；在全量 6,040 用户上，Recall@10
-  与 Popularity 基线持平，同时 NDCG@10、Coverage@10、Diversity@10 分别达到 0.0176、
-  0.0615、0.6694。
+- 设计 popularity-aware hard negative mining 与 Policy Gradient 重排策略；在全量 6,040 用户上，
+  Recall@10、NDCG@10 分别达到 0.0482、0.0238，相对 Popularity 基线均提升约 37%，并将
+  Coverage@10 从 0.0532 提升至 0.3332。
 - 搭建 FastAPI 在线服务，缓存 GNN embedding 降低请求计算开销，并使用 Docker、自动测试和
   GitHub Actions 完成训练—评估—部署闭环。
 
-不要写“准确率提升 13%”。13% 对应的是 Diversity 的相对提升，不是准确率；Recall 与
-Popularity 持平。面试中主动说明这一点更可信。
+不要把 Recall/NDCG 写成“准确率”，也不要把离线相对提升解释成线上点击率收益。准确说法是：
+在固定 MovieLens 时间切分和单随机种子下，Recall@10、NDCG@10 相对 Popularity 提升约 37%。
 
 ## 两分钟项目介绍
 
 项目解决两个问题：先从大规模物品里找相关候选，再在候选内平衡准确性和多样性。我用
 LightGCN 学习用户—物品二部图 embedding，以 BPR loss 训练召回；随后把用户向量、候选向量、
 相关性和新颖性输入策略网络，用 REINFORCE 做重排。数据按时间切分，训练图、策略奖励和最终测试
-互相隔离。结果上，图传播比相同预算的 BPR-MF 显著提高 Recall/NDCG；策略权重 0.1 时 Recall
-与热门推荐持平，但排序质量、覆盖率和多样性更好。最后把模型封装成 FastAPI，并在启动阶段缓存
-图 embedding，通过 Docker 和 CI 验证部署链路。
+互相隔离。结果上，图传播比相同预算的 BPR-MF 显著提高 Recall/NDCG；加入 hard negative
+mining 后，最终模型的 Recall/NDCG 相对热门推荐均提升约 37%。最后把模型封装成 FastAPI，
+在启动阶段缓存图 embedding，并通过 Docker 和 CI 验证部署链路。
 
 ## 高频追问
 
@@ -58,4 +58,3 @@ BPR 优化采样 pair 的相对分数，不直接等价于全物品 Top-10 Recal
 
 离线生成 item embedding 并写入 ANN 索引；user embedding 由特征服务提供；推荐服务执行向量召回、
 历史过滤、策略重排，并记录曝光/点击供后续训练。模型使用版本化发布和 A/B 实验验证长期指标。
-

@@ -14,6 +14,7 @@ from gnn_rl_recommender.lightgcn import LightGCN
 from gnn_rl_recommender.metrics import evaluate_rankings
 from gnn_rl_recommender.movielens import MovieLensSplit, load_movielens_1m
 from gnn_rl_recommender.reranker import PolicyReranker
+from gnn_rl_recommender.sampling import sample_negatives
 
 
 def train_lightgcn(
@@ -24,6 +25,8 @@ def train_lightgcn(
     seed: int,
     model: LightGCN | None = None,
     label: str = "LightGCN",
+    negative_sampling: str = "uniform",
+    hard_pool: int = 5,
 ) -> tuple[LightGCN, list[float]]:
     torch.manual_seed(seed)
     if model is None:
@@ -36,19 +39,9 @@ def train_lightgcn(
         indices = torch.randint(0, interaction_count, (samples,), generator=generator)
         users = split.train.user_ids[indices]
         positives = split.train.item_ids[indices]
-        negatives = torch.randint(0, split.train.num_items, (samples,), generator=generator)
-        invalid = torch.tensor(
-            [int(item) in split.train_seen[int(user)] for user, item in zip(users, negatives)],
-            dtype=torch.bool,
+        negatives = sample_negatives(
+            split, users, model, graph, generator, negative_sampling, hard_pool
         )
-        while invalid.any():
-            negatives[invalid] = torch.randint(
-                0, split.train.num_items, (int(invalid.sum()),), generator=generator
-            )
-            invalid = torch.tensor(
-                [int(item) in split.train_seen[int(user)] for user, item in zip(users, negatives)],
-                dtype=torch.bool,
-            )
         optimizer.zero_grad()
         loss = model.bpr_loss(graph, users, positives, negatives)
         loss.backward()
@@ -195,7 +188,14 @@ def main(args: argparse.Namespace) -> dict:
             payload = torch.load(args.resume_checkpoint, map_location="cpu", weights_only=True)
             model.load_state_dict(payload["gnn"])
         model, gnn_losses = train_lightgcn(
-            split, graph, args.gnn_epochs, args.samples_per_epoch, args.seed, model
+            split,
+            graph,
+            args.gnn_epochs,
+            args.samples_per_epoch,
+            args.seed,
+            model,
+            negative_sampling=args.negative_sampling,
+            hard_pool=args.hard_pool,
         )
         policy_losses = train_policy(
             model,
@@ -263,6 +263,8 @@ def main(args: argparse.Namespace) -> dict:
             "final_gnn_loss": None if args.load_checkpoint else round(gnn_losses[-1], 6),
             "final_policy_loss": None if args.load_checkpoint else round(policy_losses[-1], 6),
             "seed": args.seed,
+            "negative_sampling": args.negative_sampling,
+            "hard_pool": args.hard_pool,
         },
     }
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -290,6 +292,10 @@ if __name__ == "__main__":
     parser.add_argument("--mf-epochs", type=int, default=0)
     parser.add_argument("--rl-users", type=int, default=1000)
     parser.add_argument("--samples-per-epoch", type=int, default=100_000)
+    parser.add_argument(
+        "--negative-sampling", choices=["uniform", "popularity", "hard"], default="uniform"
+    )
+    parser.add_argument("--hard-pool", type=int, default=5)
     parser.add_argument("--eval-users", type=int, default=1000)
     parser.add_argument("--top-k", type=int, default=10)
     parser.add_argument("--candidate-k", type=int, default=100)

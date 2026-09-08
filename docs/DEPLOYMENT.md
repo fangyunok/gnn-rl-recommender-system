@@ -68,3 +68,18 @@ docker compose up --build -d
 
 GitHub Actions 在每次 push 与 pull request 时自动运行静态检查、单元测试和 Docker 镜像构建，
 确保仓库始终保持可部署状态。
+
+## 5. Render 公网部署
+
+仓库根目录提供 `render.yaml`。在 Render 登录后打开 README 中的 **Deploy to Render**，选择该公开
+仓库并确认 Blueprint。平台将使用 Dockerfile 构建真实模型服务，并通过 `/health` 判断部署状态。
+
+部署完成后验收：
+
+```bash
+curl https://<你的服务域名>/health
+curl "https://<你的服务域名>/v1/recommendations/1?limit=5"
+```
+
+预期健康检查包含 `"dataset":"movielens-1m"`、`"num_users":6040` 和
+`"num_items":3706`。公网实例的创建和域名由托管平台账号控制，仓库本身不保存云平台密钥。

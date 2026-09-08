@@ -4,6 +4,10 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -25,5 +29,30 @@ jobs:
         with:
           context: .
           push: false
-          tags: gnn-rl-recommender:test
-
+          load: true
+          tags: ghcr.io/${{ github.repository }}:latest
+      - name: Smoke test real-model container
+        run: |
+          docker run -d --name recommender-api -p 8000:8000 ghcr.io/${{ github.repository }}:latest
+          for attempt in {1..30}; do
+            response=$(curl -fsS http://127.0.0.1:8000/health || true)
+            if echo "$response" | grep -q '"dataset":"movielens-1m"'; then
+              echo "$response"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs recommender-api
+          exit 1
+      - uses: docker/login-action@v3
+        if: github.event_name == 'push'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish image
+        if: github.event_name == 'push'
+        run: docker push ghcr.io/${{ github.repository }}:latest
+      - name: Cleanup
+        if: always()
+        run: docker rm -f recommender-api || true

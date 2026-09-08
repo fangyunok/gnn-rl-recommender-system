@@ -31,6 +31,14 @@ curl http://127.0.0.1:8000/health
 curl "http://127.0.0.1:8000/v1/recommendations/3?limit=5"
 ```
 
+也可以直接拉取 GitHub Actions 发布的镜像：
+
+```bash
+docker pull ghcr.io/fangyunok/gnn-rl-recommender-system:latest
+docker run -d --name gnn-rl-api -p 8000:8000 \
+  ghcr.io/fangyunok/gnn-rl-recommender-system:latest
+```
+
 仓库包含由最佳模型导出的轻量 serving bundle，Docker 默认启动真实模型模式：
 
 ```powershell

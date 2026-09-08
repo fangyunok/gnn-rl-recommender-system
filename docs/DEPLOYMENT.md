@@ -48,6 +48,9 @@ docker compose up --build -d
 serving bundle 已包含 embedding、ID 映射和历史过滤信息，不需要下载 MovieLens 原始数据。
 如需重新训练或导出 bundle，再下载原始数据并运行 `scripts/export_serving_bundle.py`。
 
+生产镜像固定使用 CPU-only PyTorch，避免引入服务不需要的 CUDA 运行库；GPU 训练环境与 CPU
+推理镜像分离。
+
 ## 3. 云服务器部署
 
 服务器安装 Git 与 Docker 后执行：

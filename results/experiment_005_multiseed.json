@@ -1,0 +1,46 @@
+{
+  "seeds": [
+    7,
+    42,
+    2026
+  ],
+  "number_of_runs": 3,
+  "policy_weight": 0.2,
+  "summary": {
+    "popularity": {
+      "recall_at_k_mean": 0.035099,
+      "recall_at_k_std": 0.0,
+      "ndcg_at_k_mean": 0.017322,
+      "ndcg_at_k_std": 0.0,
+      "coverage_at_k_mean": 0.053157,
+      "coverage_at_k_std": 0.0,
+      "diversity_at_k_mean": 0.59043,
+      "diversity_at_k_std": 0.0
+    },
+    "lightgcn": {
+      "recall_at_k_mean": 0.046082,
+      "recall_at_k_std": 0.001755,
+      "ndcg_at_k_mean": 0.023175,
+      "ndcg_at_k_std": 0.001053,
+      "coverage_at_k_mean": 0.337291,
+      "coverage_at_k_std": 0.015226,
+      "diversity_at_k_mean": 0.549648,
+      "diversity_at_k_std": 0.010757
+    },
+    "lightgcn_plus_policy": {
+      "recall_at_k_mean": 0.046247,
+      "recall_at_k_std": 0.002413,
+      "ndcg_at_k_mean": 0.023318,
+      "ndcg_at_k_std": 0.001141,
+      "coverage_at_k_mean": 0.336391,
+      "coverage_at_k_std": 0.016019,
+      "diversity_at_k_mean": 0.603379,
+      "diversity_at_k_std": 0.014963
+    }
+  },
+  "source_files": [
+    "artifacts\\hard_seed7\\movielens_metrics.json",
+    "artifacts\\hard_v1\\movielens_metrics.json",
+    "artifacts\\hard_seed2026\\movielens_metrics.json"
+  ]
+}

@@ -9,6 +9,7 @@ artifacts/*.pt
 artifacts/*.json
 artifacts/**/*.pt
 artifacts/**/*.json
+!artifacts/serving_bundle.pt
 data/raw/
 dist/
 build/

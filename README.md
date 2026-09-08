@@ -1,10 +1,19 @@
+---
+title: GNN RL Recommender
+emoji: 🎬
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 8000
+pinned: false
+suggested_hardware: cpu-basic
+---
+
 # GNN + RL 个性化推荐系统
 
 [![CI](https://github.com/fangyunok/gnn-rl-recommender-system/actions/workflows/ci.yml/badge.svg)](https://github.com/fangyunok/gnn-rl-recommender-system/actions/workflows/ci.yml)
 
 生产镜像：`ghcr.io/fangyunok/gnn-rl-recommender-system:latest`
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/fangyunok/gnn-rl-recommender-system)
 
 面向推荐算法与强化学习岗位的端到端项目：使用 **LightGCN** 学习用户—物品二部图表示，
 完成候选召回；使用 **Policy Gradient** 策略同时优化相关性与多样性，完成候选重排；最终通过

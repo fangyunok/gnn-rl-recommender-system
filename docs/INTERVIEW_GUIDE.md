@@ -6,14 +6,14 @@
 
 - 基于 MovieLens-1M 构建用户—物品二部图，采用按用户时间顺序 leave-two-out 切分，使用
   LightGCN + BPR 完成 Top-100 候选召回，并通过 BPR-MF 消融验证图传播贡献。
-- 设计 popularity-aware hard negative mining 与 Policy Gradient 重排策略；在全量 6,040 用户上，
-  Recall@10、NDCG@10 分别达到 0.0482、0.0238，相对 Popularity 基线均提升约 37%，并将
-  Coverage@10 从 0.0532 提升至 0.3332。
+- 设计 popularity-aware hard negative mining 与 Policy Gradient 重排策略；三随机种子、全量
+  6,040 用户实验中，Recall@10、NDCG@10 分别达到 0.0462±0.0024、0.0233±0.0011，
+  相对 Popularity 平均提升约 31.8% 和 34.6%。
 - 搭建 FastAPI 在线服务，缓存 GNN embedding 降低请求计算开销，并使用 Docker、自动测试和
   GitHub Actions 完成训练—评估—部署闭环。
 
 不要把 Recall/NDCG 写成“准确率”，也不要把离线相对提升解释成线上点击率收益。准确说法是：
-在固定 MovieLens 时间切分和单随机种子下，Recall@10、NDCG@10 相对 Popularity 提升约 37%。
+在固定 MovieLens 时间切分和三随机种子下，Recall@10、NDCG@10 平均相对提升约 31.8%、34.6%。
 
 ## 两分钟项目介绍
 
@@ -21,7 +21,7 @@
 LightGCN 学习用户—物品二部图 embedding，以 BPR loss 训练召回；随后把用户向量、候选向量、
 相关性和新颖性输入策略网络，用 REINFORCE 做重排。数据按时间切分，训练图、策略奖励和最终测试
 互相隔离。结果上，图传播比相同预算的 BPR-MF 显著提高 Recall/NDCG；加入 hard negative
-mining 后，最终模型的 Recall/NDCG 相对热门推荐均提升约 37%。最后把模型封装成 FastAPI，
+mining 后，最终模型的 Recall/NDCG 平均相对热门推荐提升约 31.8%/34.6%。最后把模型封装成 FastAPI，
 在启动阶段缓存图 embedding，并通过 Docker 和 CI 验证部署链路。
 
 ## 高频追问

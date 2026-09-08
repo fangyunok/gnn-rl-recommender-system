@@ -5,7 +5,7 @@ services:
       - "8000:8000"
     environment:
       MODEL_DIR: /app/artifacts
-      DATASET: ${DATASET:-synthetic}
+      DATASET: ${DATASET:-movielens}
       MOVIELENS_DIR: /app/data/raw/ml-1m
       POLICY_WEIGHT: ${POLICY_WEIGHT:-0.2}
     volumes:

@@ -31,14 +31,14 @@ curl http://127.0.0.1:8000/health
 curl "http://127.0.0.1:8000/v1/recommendations/3?limit=5"
 ```
 
-Docker 默认启动无需权重的合成数据演示模式。启动真实模型模式：
+仓库包含由最佳模型导出的轻量 serving bundle，Docker 默认启动真实模型模式：
 
 ```powershell
-$env:DATASET="movielens"
 docker compose up --build -d
 ```
 
-Compose 会以只读方式挂载本地 `artifacts` 和 MovieLens 数据目录。
+serving bundle 已包含 embedding、ID 映射和历史过滤信息，不需要下载 MovieLens 原始数据。
+如需重新训练或导出 bundle，再下载原始数据并运行 `scripts/export_serving_bundle.py`。
 
 ## 3. 云服务器部署
 

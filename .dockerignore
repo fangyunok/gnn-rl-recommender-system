@@ -3,5 +3,5 @@
 __pycache__
 .pytest_cache
 artifacts/*.pt
+!artifacts/serving_bundle.pt
 data/raw
-

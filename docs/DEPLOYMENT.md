@@ -68,25 +68,3 @@ docker compose up --build -d
 
 GitHub Actions 在每次 push 与 pull request 时自动运行静态检查、单元测试和 Docker 镜像构建，
 确保仓库始终保持可部署状态。
-
-## 5. Streamlit Community Cloud 在线演示
-
-公开地址：<https://gnn-rl-recommender-system-v9xlm2pmungez6xiap2kkw.streamlit.app/>
-
-仓库根目录的 `streamlit_app.py` 提供真实模型交互页面。打开 README 的 **Open in Streamlit**，
-使用 GitHub 登录后选择：
-
-- Repository：`fangyunok/gnn-rl-recommender-system`
-- Branch：`main`
-- Main file path：`streamlit_app.py`
-
-应用读取仓库中的 serving bundle，不需要 Secret、原始数据或外部模型下载。
-
-部署完成后验收：
-
-```bash
-浏览器打开平台生成的 `https://<应用名>.streamlit.app` 地址。
-```
-
-网页应显示三随机种子指标，并能为用户 ID 1–6040 返回真实电影 ID。Streamlit 主要用于求职演示；
-FastAPI 生产接口继续使用 Docker/GHCR 部署。

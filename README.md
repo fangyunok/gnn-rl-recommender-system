@@ -4,10 +4,6 @@
 
 生产镜像：`ghcr.io/fangyunok/gnn-rl-recommender-system:latest`
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://gnn-rl-recommender-system-v9xlm2pmungez6xiap2kkw.streamlit.app/)
-
-**在线演示：** https://gnn-rl-recommender-system-v9xlm2pmungez6xiap2kkw.streamlit.app/
-
 面向推荐算法与强化学习岗位的端到端项目：使用 **LightGCN** 学习用户—物品二部图表示，
 完成候选召回；使用 **Policy Gradient** 策略同时优化相关性与多样性，完成候选重排；最终通过
 FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务闭环。
@@ -80,10 +76,6 @@ Docker 与云服务器部署见 [部署手册](docs/DEPLOYMENT.md)。
 
 Docker 镜像内置约 8.9 MiB 的真实模型 serving bundle；无需下载原始数据即可启动 MovieLens
 推荐接口。训练权重与原始数据仍不提交，bundle 只包含推理所需 embedding、映射和历史过滤索引。
-
-无需信用卡的[在线演示](https://gnn-rl-recommender-system-v9xlm2pmungez6xiap2kkw.streamlit.app/)
-使用 `streamlit_app.py`，读取同一个真实模型 bundle，可调整用户 ID、推荐数量和 Policy 权重，
-并对比重排前后的列表。
 
 ## 仓库结构
 

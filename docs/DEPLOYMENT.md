@@ -69,25 +69,22 @@ docker compose up --build -d
 GitHub Actions 在每次 push 与 pull request 时自动运行静态检查、单元测试和 Docker 镜像构建，
 确保仓库始终保持可部署状态。
 
-## 5. Hugging Face Spaces 公网部署
+## 5. Streamlit Community Cloud 在线演示
 
-项目 README 已包含 Docker Space 元数据，使用 CPU Basic 硬件和 8000 端口。首次部署先登录：
+仓库根目录的 `streamlit_app.py` 提供真实模型交互页面。打开 README 的 **Open in Streamlit**，
+使用 GitHub 登录后选择：
 
-```powershell
-hf auth login
-python -m pip install huggingface_hub
-python scripts\deploy_huggingface.py --repo-id <你的HF用户名>/gnn-rl-recommender
-```
+- Repository：`fangyunok/gnn-rl-recommender-system`
+- Branch：`main`
+- Main file path：`streamlit_app.py`
 
-脚本会创建公开 Docker Space，并上传仓库所需文件；不会上传 `.git`、虚拟环境、原始数据或本地
-训练检查点。Space 将根据 Dockerfile 自动构建真实模型服务。
+应用读取仓库中的 serving bundle，不需要 Secret、原始数据或外部模型下载。
 
 部署完成后验收：
 
 ```bash
-curl https://<你的服务域名>/health
-curl "https://<你的服务域名>/v1/recommendations/1?limit=5"
+浏览器打开平台生成的 `https://<应用名>.streamlit.app` 地址。
 ```
 
-预期健康检查包含 `"dataset":"movielens-1m"`、`"num_users":6040` 和
-`"num_items":3706`。公网实例的创建需要 Hugging Face 账号授权，仓库不保存访问令牌。
+网页应显示三随机种子指标，并能为用户 ID 1–6040 返回真实电影 ID。Streamlit 主要用于求职演示；
+FastAPI 生产接口继续使用 Docker/GHCR 部署。

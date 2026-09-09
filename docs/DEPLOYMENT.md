@@ -71,6 +71,8 @@ GitHub Actions 在每次 push 与 pull request 时自动运行静态检查、单
 
 ## 5. Streamlit Community Cloud 在线演示
 
+公开地址：<https://gnn-rl-recommender-system-v9xlm2pmungez6xiap2kkw.streamlit.app/>
+
 仓库根目录的 `streamlit_app.py` 提供真实模型交互页面。打开 README 的 **Open in Streamlit**，
 使用 GitHub 登录后选择：
 

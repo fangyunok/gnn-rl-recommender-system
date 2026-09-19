@@ -4,9 +4,20 @@
 
 生产镜像：`ghcr.io/fangyunok/gnn-rl-recommender-system:latest`
 
-面向推荐算法与强化学习岗位的端到端项目：使用 **LightGCN** 学习用户—物品二部图表示，
+端到端个性化推荐系统：使用 **LightGCN** 学习用户—物品二部图表示，
 完成候选召回；使用 **Policy Gradient** 策略同时优化相关性与多样性，完成候选重排；最终通过
 FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务闭环。
+
+## 先看结论
+
+| 问题 | 实验结论 | 证据 |
+|---|---|---|
+| 图协同过滤是否优于热门推荐 | Recall@10由`0.035099`提升到`0.046082` | MovieLens-1M、6,040名用户、三随机种子 |
+| RL重排是否只牺牲相关性换多样性 | Diversity@10由`0.549648`提升到`0.603379`，Recall/NDCG基本持平 | 相同LightGCN候选上的策略对照 |
+| 结果是否稳定 | 报告mean±std，并保留三随机种子产物 | [实验005](docs/EXPERIMENT_005_MULTISEED.md) |
+| 是否可运行 | 真实模型serving bundle、FastAPI、Docker、CI | [部署手册](docs/DEPLOYMENT.md) |
+
+> 离线指标只说明该数据切分和实验协议下的变化，不等同于线上CTR或长期收益。策略奖励中的多样性权重为人工设定，仍需在线A/B实验验证。
 
 ## 系统流程
 
@@ -15,6 +26,21 @@ FastAPI、Docker 与 GitHub Actions 形成可复现的训练—评测—服务�
                                              |
 用户状态 + 候选相关性 + 新颖性 ------------> RL Policy -> 推荐列表 -> REST API
 ```
+
+这个仓库聚焦**召回、重排与离线推荐评测**；不把LLM后训练、多模态检索或通用Agent能力计入推荐效果。
+
+## 5分钟验证
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+pytest -q
+python scripts\train.py --epochs 5
+uvicorn gnn_rl_recommender.app:app --reload
+```
+
+这条快速路径使用合成数据验证训练与服务链路；正式结论来自下方MovieLens-1M实验。
 
 ## 当前能力
 

@@ -14,7 +14,8 @@ epoch、每轮 100,000 个三元组、hard pool=5、3 个 Policy epoch，并在�
 | LightGCN + Policy（0.2） | **0.046247±0.002413** | **0.023318±0.001141** | **0.336391±0.016019** | **0.603379±0.014963** |
 
 相对 Popularity，最终模型的平均 Recall@10 提升约 31.76%，平均 NDCG@10 提升约 34.61%，
-三次独立运行都高于 Popularity。
+三次独立运行都高于 Popularity。需要注意，这一提升几乎全部来自 Popularity → LightGCN 的图召回环节，
+不是策略重排带来的。
 
 Policy 相对未重排 LightGCN 的均值变化较小：Recall、NDCG 分别约提高 0.36%、0.62%，
 Diversity 约提高 9.78%。seed 7 和 2026 中 Policy 会轻微降低 Recall，因此不能宣称 RL 稳定提升

@@ -7,22 +7,29 @@
 - 基于 MovieLens-1M 构建用户—物品二部图，采用按用户时间顺序 leave-two-out 切分，使用
   LightGCN + BPR 完成 Top-100 候选召回，并通过 BPR-MF 消融验证图传播贡献。
 - 设计 popularity-aware hard negative mining 与 Policy Gradient 重排策略；三随机种子、全量
-  6,040 用户实验中，Recall@10、NDCG@10 分别达到 0.0462±0.0024、0.0233±0.0011，
-  相对 Popularity 平均提升约 31.8% 和 34.6%。
+  6,040 用户实验中，LightGCN 召回将 Recall@10 由 `0.035099` 提升到 `0.046082±0.001755`，
+  NDCG@10 由 `0.017322` 提升到 `0.023175±0.001053`（相对 Popularity 约 `+31%` / `+34%`，
+  该提升来自图召回而非策略网络）；策略重排在此基础上把 Diversity@10 由 `0.549648` 提升到
+  `0.603379`，Recall/NDCG 变化在噪声范围内。
 - 搭建 FastAPI 在线服务，缓存 GNN embedding 降低请求计算开销，并使用 Docker、自动测试和
   GitHub Actions 完成训练—评估—部署闭环。
 
-不要把 Recall/NDCG 写成“准确率”，也不要把离线相对提升解释成线上点击率收益。准确说法是：
-在固定 MovieLens 时间切分和三随机种子下，Recall@10、NDCG@10 平均相对提升约 31.8%、34.6%。
+不要把 Recall/NDCG 写成“准确率”，也不要把离线相对提升解释成线上点击率收益，更不要把
+`31.8%/34.6%` 说成 RL 的贡献。准确说法是：在固定 MovieLens 时间切分和三随机种子下，相对
+Popularity 基线，最终系统 Recall@10、NDCG@10 平均提升约 `31.8%`、`34.6%`，其中主要贡献来自
+LightGCN 图召回（Popularity → LightGCN 一段）；Policy 重排可验证的收益是 Diversity@10 由
+`0.5496` 提升到 `0.6034`，Recall/NDCG 基本持平。若被追问“RL 到底有没有用”，答案是：在相关性上
+没有统计显著提升，价值在于同等相关性下把列表多样性提高约 `9.8%`。
 
 ## 两分钟项目介绍
 
 项目解决两个问题：先从大规模物品里找相关候选，再在候选内平衡准确性和多样性。我用
 LightGCN 学习用户—物品二部图 embedding，以 BPR loss 训练召回；随后把用户向量、候选向量、
 相关性和新颖性输入策略网络，用 REINFORCE 做重排。数据按时间切分，训练图、策略奖励和最终测试
-互相隔离。结果上，图传播比相同预算的 BPR-MF 显著提高 Recall/NDCG；加入 hard negative
-mining 后，最终模型的 Recall/NDCG 平均相对热门推荐提升约 31.8%/34.6%。最后把模型封装成 FastAPI，
-在启动阶段缓存图 embedding，并通过 Docker 和 CI 验证部署链路。
+互相隔离。结果上，图传播比相同预算的 BPR-MF 显著提高 Recall/NDCG；在 hard-negative LightGCN
+候选上，最终系统相对热门推荐的 Recall@10 / NDCG@10 平均提升约 `31.8%` / `34.6%`，这部分主要
+由图召回带来；策略重排本身把 Diversity@10 从 `0.5496` 提到 `0.6034`，Recall/NDCG 基本不变。
+最后把模型封装成 FastAPI，在启动阶段缓存图 embedding，并通过 Docker 和 CI 验证部署链路。
 
 ## 高频追问
 

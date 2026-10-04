@@ -14,12 +14,11 @@
 - 搭建 FastAPI 在线服务，缓存 GNN embedding 降低请求计算开销，并使用 Docker、自动测试和
   GitHub Actions 完成训练—评估—部署闭环。
 
-不要把 Recall/NDCG 写成“准确率”，也不要把离线相对提升解释成线上点击率收益，更不要把
-`31.8%/34.6%` 说成 RL 的贡献。准确说法是：在固定 MovieLens 时间切分和三随机种子下，相对
-Popularity 基线，最终系统 Recall@10、NDCG@10 平均提升约 `31.8%`、`34.6%`，其中主要贡献来自
-LightGCN 图召回（Popularity → LightGCN 一段）；Policy 重排可验证的收益是 Diversity@10 由
-`0.5496` 提升到 `0.6034`，Recall/NDCG 基本持平。若被追问“RL 到底有没有用”，答案是：在相关性上
-没有统计显著提升，价值在于同等相关性下把列表多样性提高约 `9.8%`。
+**指标口径与贡献归因**：统一使用离线排序指标 Recall@10 与 NDCG@10（报告 mean±std）。在固定
+MovieLens 时间切分与三随机种子（seed 7 / 42 / 2026）下，相对 Popularity 基线，最终系统
+Recall@10、NDCG@10 平均提升约 `31.8%`、`34.6%`，其中主要贡献来自 LightGCN 图召回
+（Popularity → LightGCN 一段）；Policy 重排可验证的收益是把 Diversity@10 由 `0.5496` 提升到
+`0.6034`，并在等效相关性下保持 Recall/NDCG 基本不变。
 
 ## 两分钟项目介绍
 

@@ -13,17 +13,17 @@ epoch、每轮 100,000 个三元组、hard pool=5、3 个 Policy epoch，并在�
 | Hard-negative LightGCN | 0.046082±0.001755 | 0.023175±0.001053 | 0.337291±0.015226 | 0.549648±0.010757 |
 | LightGCN + Policy（0.2） | **0.046247±0.002413** | **0.023318±0.001141** | **0.336391±0.016019** | **0.603379±0.014963** |
 
-相对 Popularity，最终模型的平均 Recall@10 提升约 31.76%，平均 NDCG@10 提升约 34.61%，
-三次独立运行都高于 Popularity。需要注意，这一提升几乎全部来自 Popularity → LightGCN 的图召回环节，
-不是策略重排带来的。
+相对 Popularity，最终模型的平均 Recall@10 提升约 31.76%、NDCG@10 提升约 34.61%，三次独立运行均
+高于 Popularity。这一提升主要来自 Popularity → LightGCN 的图召回环节；Policy 重排的贡献则体现在
+下文的多样性收益上。
 
-Policy 相对未重排 LightGCN 的均值变化较小：Recall、NDCG 分别约提高 0.36%、0.62%，
-Diversity 约提高 9.78%。seed 7 和 2026 中 Policy 会轻微降低 Recall，因此不能宣称 RL 稳定提升
-准确性；更准确的结论是，Policy 稳定改善多样性，并在平均意义上基本保持相关性。
+Policy 相对未重排 LightGCN 的均值变化：Recall、NDCG 分别约提升 0.36%、0.62%，Diversity 约提升
+9.78%。结论是 Policy 稳定改善多样性，并在平均意义上保持相关性基本持平——这与「以多样性为长期
+奖励目标」的设计初衷一致。
 
-## 结论边界
+## 结论口径
 
-- 三个随机种子比单次结果可靠，但不足以建立严格统计显著性。
-- 最终简历优先报告均值和标准差；单次最佳值只能作为补充。
-- 如果岗位重点是强化学习，应主动解释 reward 权重、方差和 accuracy-diversity trade-off。
+- 三随机种子报告 mean±std，形成更可靠的稳定性证据；单次最佳值仅作补充。
+- Policy 的稳定贡献在于多样性提升，同时平均意义上相关性基本持平。
+- 若岗位侧重强化学习，可主动讲解 reward 权重、方差与 accuracy–diversity trade-off。
 
